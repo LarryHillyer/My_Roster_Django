@@ -1,9 +1,10 @@
-<html>
+<html ng-app="my-roster">
 <head>
     <meta charset="UTF-8">
     <title>My_Roster</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" >
+    
+    <link rel="stylesheet" href= "/static/bower_components/bootstrap/dist/css/bootstrap.min.css" >
+    <link rel="stylesheet" href= "/static/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" >   
     <link rel="stylesheet" href="/static/css/site.css">
 </head>
 <body>
@@ -15,6 +16,7 @@
                     <div class="player-header">
                         <h2>Players</h2>
                         <p>The best players in the NFL</p>
+                        <button id = 'get-players'>Get Players</button>
                     </div>
 
                     <div id="player-list" class="player-roster">
@@ -54,8 +56,13 @@
             </div>
         </div>
         
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <ul id = "nfl_roster"> 
+            
+        </ul>
+        
+        <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/static/bower_components/angular/angular.min.js"></script>
         <script src="/static/scripts/app.js"></script>
 </body>
 

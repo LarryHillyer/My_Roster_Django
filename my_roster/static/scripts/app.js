@@ -1,3 +1,5 @@
+var app = angular.module("my-roster", [])
+
 var roster = {players:[]}
 
 var playerListElem = document.getElementById("player-list");
@@ -61,18 +63,19 @@ function getCurrentPlayers(){
 function drawPlayerCard1(currentPlayer) {
     var $card = $('<div class="player-card">');
     $($card).attr("style","background-image: url("+currentPlayer.image+")")
-    //var $img ="<img src="+ currentPlayer.image + " alt= '...' >";
+
     var $rmvBtn = $('<button class="btn btn-danger inline">Remove</button>');
     var $name = "<p>" + currentPlayer.name + "</p>";
     var $pos = "<p>" + currentPlayer.position + "</p>";
     var $num = "<p>" + currentPlayer.num + "</p>";    
-    //$card.append($img);
+    
     $card.append($rmvBtn);
     $card.append($name);    
     $card.append($pos);
     $card.append($num);
     
-    
+    //var $img ="<img src="+ currentPlayer.image + " alt= '...' >";
+    //$card.append($img);    
     
     $(".player-roster").append($card);
     
@@ -93,17 +96,23 @@ var requestor = function(){
     $.get(apiUrl).success(function(res){
             var resToObj = JSON.parse(res);
             var players = resToObj.body.players;
-            getNflPlayers(players)
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].pro_status === null || players[i].firstname.length <=0 ) {
+                    players.splice(i,1);
+                    i--;
+                } 
+            }
+            getNflPlayers(players);
         })
 }
 
 function getNflPlayers(players){
     for(var i = 0; i < 100; i++){
-        $('#courses').append('<li>' + players[i].fullname + '<img src="'+players[i].photo+'"/></li>');
+        $('#nfl_roster').append('<li>' + players[i].fullname + '<img src="'+players[i].photo+'"/></li>');
     }
 }
 
-
+$('#get-players').click(requestor);
 
 //var buttons = jQuery('button');
 // $('.player-roster').on('click', 'button', removePlayerCard)
