@@ -18,5 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^my_roster/', include('my_roster.urls', namespace = 'my_roster')),
+    url(r'^my_roster/', include('my_roster.urls', \
+        namespace = 'my_roster')),
 ]

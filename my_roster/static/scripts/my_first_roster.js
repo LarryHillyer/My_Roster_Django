@@ -1,4 +1,4 @@
-var app = angular.module("my-roster", [])
+// var app = angular.module("my-roster", [])
 
 var roster = {players:[]}
 
@@ -12,6 +12,7 @@ function Player(id, name, position, num, image) {
     this.image = image;  
 }
 
+/*  event handler for form submission*/
 $(".player-form1").submit(function(e) {
     e.preventDefault();
     var playerName = $('#player-name').val();
@@ -48,17 +49,6 @@ function getCurrentPlayers(){
     }    
 }
 
-// function drawPlayerOnScreen(currentPlayer) {
-//     var playerCardElem = document.createElement("div");
-//     playerCardElem.className = "player-card";
-//     playerCardElem.attr("id", currentPlayer.id.toString());
-//     playerCardElem.innerHTML ="<img src=" + currentPlayer.image + " alt= '...' > <p>" + currentPlayer.name + "</p> <p>" + currentPlayer.position + "</p> <p>" + currentPlayer.num + "</p> </div>";
-//     playerListElem.appendChild(playerCardElem);
-// }
-
-// function drawPlayerCard(currentPlayer) {
-//     $(".player-roster").append("<div class = 'player-card' id= " + currentPlayer.id.toString() + "> <img src="+ currentPlayer.image + " alt= '...' > <p>" + currentPlayer.name + "</p> <p>" + currentPlayer.position + "</p> <p>" + currentPlayer.num + "</p> <div class = 'btn-group'><button>Remove</button> </div></div>");    
-// }
 
 function drawPlayerCard1(currentPlayer) {
     var $card = $('<div class="player-card">');
@@ -89,6 +79,7 @@ function drawPlayerCard1(currentPlayer) {
     })
 }
 
+/*  Ajax call to get players from cbs server using surrogate server*/
 var requestor = function(){
     var url = "http://bcw-getter.herokuapp.com/?url=";
     var url2 = "http://api.cbssports.com/fantasy/players/list?version=3.0&SPORT=football&response_format=json";
@@ -96,39 +87,65 @@ var requestor = function(){
     $.get(apiUrl).success(function(res){
             var resToObj = JSON.parse(res);
             var players = resToObj.body.players;
+            var teams = [];           
+            var positions = [];
             for (var i = 0; i < players.length; i++) {
+                var teamIsNew = true;
+                var positionIsNew = true;
                 if (players[i].pro_status === null || players[i].firstname.length <=0 ) {
                     players.splice(i,1);
                     i--;
-                } 
-            }
-            getNflPlayers(players);
-        })
-}
+                }
+                if (i === 0 ) {
+                     for (var j = 0; j<teams.length;j++) {                       
+                        if (teams[j] == players[0].pro_team) {
+                            teamIsNew=false;
+                        }                    
+                    }
+                    
+                    if (teamIsNew && typeof players[0].pro_team !== "undefined" && players[0].position !== "") {
+                        teams.push(players[0].pro_team);
+                        positions.push(players[0].position)
+                    }
 
-function getNflPlayers(players){
-    for(var i = 0; i < 100; i++){
-        $('#nfl_roster').append('<li>' + players[i].fullname + '<img src="'+players[i].photo+'"/></li>');
-    }
+                } else if (i>0) {
+                    
+                    for (var j = 1; j<teams.length;j++) {                       
+                        if (teams[j] == players[i].pro_team) {
+                            teamIsNew=false;
+                        }                    
+                    }
+                    
+                    if (teamIsNew && typeof players[i].pro_team !== "undefined") {
+                        teams.push(players[i].pro_team);
+                    }
+                    
+                    for (var j =1; j<positions.length; j++) {                       
+                        if (positions[j] == players[i].position ) {
+                            positionIsNew=false;
+                        }                       
+                    }
+                    
+                    if (positionIsNew && typeof players[i].position !== "undefined" && players[i].position!=="") {
+                            positions.push(players[i].position);
+                    }
+                    
+                } else if (i < 0) {
+                        i=0
+                }                        
+            }
+            var playersJSON = JSON.stringify(players);
+            var teamsJSON = JSON.stringify(teams);
+            var positionsJSON = JSON.stringify(positions);
+            $.post("/my_roster/put_nfl_players/", {'nfl_players' : playersJSON})
+            $.post("/my_roster/put_nfl_teams/", {'nfl_teams' : teamsJSON})            
+            $.post("/my_roster/put_nfl_positions/", {'nfl_positions' : positionsJSON})            
+        })
 }
 
 $('#get-players').click(requestor);
 
-//var buttons = jQuery('button');
-// $('.player-roster').on('click', 'button', removePlayerCard)
 
-
-// function removePlayerCard(e) {
-//     var btn = $(e.target);
-//     var playerCardId = btn.closest('.player-card').attr('id');
-    
-//     for (var i =0; i < roster.players.length; i++) {
-//         if (playerCardId == roster.players[i].id) {
-//             roster.players.splice(i, 1);
-//             getCurrentPlayers();
-//         }
-//     }
-// }
 
 // function PlayerService() {
 //     var playerData = [];
@@ -164,3 +181,48 @@ $('#get-players').click(requestor);
 // $('some-button').on("click", function(){
 //     var teamSF = playerServive.getPlayersByTeam("SF");
 // });
+
+
+
+
+
+/* Draw player-card using javascript
+// function drawPlayerOnScreen(currentPlayer) {
+//     var playerCardElem = document.createElement("div");
+//     playerCardElem.className = "player-card";
+//     playerCardElem.attr("id", currentPlayer.id.toString());
+//     playerCardElem.innerHTML ="<img src=" + currentPlayer.image + " alt= '...' > <p>" + currentPlayer.name + "</p> <p>" + currentPlayer.position + "</p> <p>" + currentPlayer.num + "</p> </div>";
+//     playerListElem.appendChild(playerCardElem);
+// }
+
+*/
+
+/* Draw player-card using jquery
+// function drawPlayerCard(currentPlayer) {
+//     $(".player-roster").append("<div class = 'player-card' id= " + currentPlayer.id.toString() + "> <img src="+ currentPlayer.image + " alt= '...' > <p>" + currentPlayer.name + "</p> <p>" + currentPlayer.position + "</p> <p>" + currentPlayer.num + "</p> <div class = 'btn-group'><button>Remove</button> </div></div>");    
+// } 
+*/
+
+/* register event handler using jquery
+//var buttons = jQuery('button');
+// $('.player-roster').on('click', 'button', removePlayerCard)
+
+
+// function removePlayerCard(e) {
+//     var btn = $(e.target);
+//     var playerCardId = btn.closest('.player-card').attr('id');
+    
+//     for (var i =0; i < roster.players.length; i++) {
+//         if (playerCardId == roster.players[i].id) {
+//             roster.players.splice(i, 1);
+//             getCurrentPlayers();
+//         }
+//     }
+// }
+*/
+
+
+
+
+
+
