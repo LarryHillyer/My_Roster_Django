@@ -1,4 +1,4 @@
-// var app = angular.module("my-roster", [])
+// app = angular.module("my-roster")
 
 var roster = {players:[]}
 
@@ -89,9 +89,13 @@ var requestor = function(){
             var players = resToObj.body.players;
             var teams = [];           
             var positions = [];
+            var jersey_numbers = [];
+            
             for (var i = 0; i < players.length; i++) {
                 var teamIsNew = true;
                 var positionIsNew = true;
+                var jerseyIsNew = true;
+                
                 if (players[i].pro_status === null || players[i].firstname.length <=0 ) {
                     players.splice(i,1);
                     i--;
@@ -103,9 +107,10 @@ var requestor = function(){
                         }                    
                     }
                     
-                    if (teamIsNew && typeof players[0].pro_team !== "undefined" && players[0].position !== "") {
+                    if (teamIsNew && players[0].pro_team !== undefined && players[0].position !== "" && players[0].jersey !== undefined) {
                         teams.push(players[0].pro_team);
                         positions.push(players[0].position)
+                        jersey_numbers.push(players[0].jersey)
                     }
 
                 } else if (i>0) {
@@ -116,7 +121,7 @@ var requestor = function(){
                         }                    
                     }
                     
-                    if (teamIsNew && typeof players[i].pro_team !== "undefined") {
+                    if (teamIsNew && players[i].pro_team !== undefined) {
                         teams.push(players[i].pro_team);
                     }
                     
@@ -126,8 +131,18 @@ var requestor = function(){
                         }                       
                     }
                     
-                    if (positionIsNew && typeof players[i].position !== "undefined" && players[i].position!=="") {
+                    if (positionIsNew && players[i].position !== undefined && players[i].position!=="") {
                             positions.push(players[i].position);
+                    }
+                    
+                    for (var j =1; j<jersey_numbers.length; j++) {                       
+                        if (jersey_numbers[j] == players[i].jersey ) {
+                            jerseyIsNew=false;
+                        }                       
+                    }
+                    
+                    if (jerseyIsNew && players[i].jersey !== undefined && players[i].jersey!=="") {
+                            jersey_numbers.push(players[i].jersey);
                     }
                     
                 } else if (i < 0) {
@@ -137,9 +152,11 @@ var requestor = function(){
             var playersJSON = JSON.stringify(players);
             var teamsJSON = JSON.stringify(teams);
             var positionsJSON = JSON.stringify(positions);
+            var jersey_numbersJSON = JSON.stringify(jersey_numbers)
             $.post("/my_roster/put_nfl_players/", {'nfl_players' : playersJSON})
             $.post("/my_roster/put_nfl_teams/", {'nfl_teams' : teamsJSON})            
-            $.post("/my_roster/put_nfl_positions/", {'nfl_positions' : positionsJSON})            
+            $.post("/my_roster/put_nfl_positions/", {'nfl_positions' : positionsJSON}) 
+            $.post("/my_roster/put_nfl_jersey_numbers/", {'nfl_jersey_numbers': jersey_numbersJSON})           
         })
 }
 

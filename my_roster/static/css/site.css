@@ -2,9 +2,9 @@
     display:inline-block;
     position:relative;
     border: 1px solid black;
-    min-height: 200px;
+    min-height: 223px;
     min-width: 200px;
-    /*background-image: "http://s.nflcdn.com/static/content/public/image/fantasy/transparent/200x200/";*/
+    
 }
 .player-card img{
     position: absolute;
